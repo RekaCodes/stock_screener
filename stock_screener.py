@@ -21,7 +21,7 @@ def main():
 
 
     filter_stock = st.text_input(
-        label='insert ticker symbol here')
+        label='Insert ticker symbol.')
     
     filter_period = '6mo'
     filter_interval = '1d'
@@ -55,18 +55,18 @@ def main():
 
     
     if st.button('Get stock data'):
-        data=yf.download([filter_stock, 'SPY'], period=filter_period, interval=filter_interval, group_by='ticker', auto_adjust=True)
+        data=yf.download([filter_stock.upper(), 'SPY'], period=filter_period, interval=filter_interval, group_by='ticker', auto_adjust=True)
 
 
 
         st.markdown("#")
 
-        fig1= mpl.plot(data=data[filter_stock], type='candle', mav=(5,20,50), volume=True,  title=filter_stock)
+        fig1= mpl.plot(data=data[filter_stock.upper()], type='candle', mav=(5,20,50), volume=True,  title=filter_stock.upper())
         
         st.pyplot(fig=fig1)
 
         with st.beta_expander(label='Click for data'):
-            st.write(data[filter_stock])
+            st.write(data[filter_stock.upper()])
 
 
 
