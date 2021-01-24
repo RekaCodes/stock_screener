@@ -58,7 +58,7 @@ def main():
 
         st.markdown("#")
 
-        fig1= mpl.plot(data=data[filter_stock.upper()], type='candle', mav=(5,20,50), volume=True,  title=filter_stock.upper())
+        fig1= mpl.plot(data=data[filter_stock.upper()], type='candle', style='charles', mav=(5,20,50), volume=True,  title=filter_stock.upper())
         
         st.pyplot(fig=fig1)
 
