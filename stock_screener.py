@@ -33,9 +33,9 @@ def main():
     ### webpage ###
     st.title("Stock Screener")
 
-    filter_period = '6mo'
-    filter_interval = '1d'
-    chart_type = 'candle'
+    # filter_period = '6mo'
+    # filter_interval = '1d'
+    # chart_type = 'candle'
 
     col1, col2 = st.beta_columns([1,3])
     with col1:
@@ -62,18 +62,14 @@ def main():
             pct_chg_frm_close = chg_frm_close/close_prior
             chg_frm_close = "${:0,.2f}".format(chg_frm_close).replace('$-','-$')
             pct_chg_frm_close = "{:.1%}".format(pct_chg_frm_close).replace('$-','-$')
-            # st.write(stats_data.iloc[1,[filter_stock.upper()]['Close']])
-            # st.write('Change from Close ')
-        # st.markdown(f'<i class="material-icons">{icon_name}</i>', unsafe_allow_html=True)
+    
             st.header(f"{chg_frm_close} {pct_chg_frm_close}")
             st.write("Change from close")
-            # st.header('{:.1%}'.format(chg_frm_close))
-
 
         stock_fig = mpl.plot(data=chart_data[filter_stock.upper()], type=chart_type.lower(), style='yahoo', mav=(5,10,25), volume=True, title=filter_stock.upper())
         st.pyplot(stock_fig)
 
-        st.write(stock_data.info)
+        # st.write(stock_data.info)
 
         with st.beta_expander(label='Click for data'):
             st.write(chart_data[filter_stock.upper()])
