@@ -76,7 +76,7 @@ def main():
         if st.button("Setting New Highs"):
             st.warning("Coming Soon!")
     with col04:
-        if st.button("High Dividends (>5%)"):
+        if st.button("High Dividends"):
             st.warning("Coming Soon!")
         if st.button("Undervalued Stocks"):
             st.warning("Coming Soon!")
