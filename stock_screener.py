@@ -1,7 +1,9 @@
+from numpy.core.fromnumeric import size
 import streamlit as st
-st.set_page_config(layout='centered')
+st.set_page_config(layout='wide')
 import pandas as pd
 import matplotlib.pyplot as plt
+# import plotly.express as pe
 import mplfinance as mpl
 import yfinance as yf
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -11,6 +13,8 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # build app #
 def main():
+
+  
     ### sidebar ###
 
     st.sidebar.header('Chart Setup.')
@@ -31,22 +35,43 @@ def main():
 
 
     ### webpage ###
+
     st.title("Stock Screener")
+    st.write('Select a strategy or lookup a specific stock')
 
-    # filter_period = '6mo'
-    # filter_interval = '1d'
-    # chart_type = 'candle'
+    st.markdown("#")
 
-    col1, col2 = st.beta_columns([1,3])
+    col01, col02, col03, col04, col05, col06 = st.beta_columns(6)
+    with col01:
+        st.button("Setting New Lows")  ## yahoo finance screeners
+    with col02:
+        st.button("Setting New Highs")
+    with col03:
+        st.button("Undervalued Stocks")
+    with col04:
+        st.button("High Dividends (>5%)")
+    with col05:
+        st.button("Most Active")
+    with col06:
+        st.button("Insider Trading") ## openinsider insider purchases
+
+    st.markdown("___")
+
+
+    col1, col2, col3 = st.beta_columns([2,1,12])
     with col1:
         filter_stock = st.text_input(label="", value='AAPL')
-    with col2:
-        st.write("")
+
+
+
     if st.button('Get stock data'):
         chart_data=yf.download([filter_stock.upper(), 'SPY'], period=filter_period, interval=filter_interval, group_by='ticker', auto_adjust=True)
         stock_data = yf.Ticker(filter_stock.upper())
 
-        st.header(stock_data.info['shortName'])
+        with col3:
+         st.text_area(label=f"About {stock_data.info['shortName']}", value=stock_data.info['longBusinessSummary'], height=200)
+
+        st.header(f"{stock_data.info['shortName']} {stock_data.info['symbol']}")
 
         col7, col8, col9 = st.beta_columns(3)
         with col7:
@@ -62,17 +87,30 @@ def main():
             pct_chg_frm_close = chg_frm_close/close_prior
             chg_frm_close = "${:0,.2f}".format(chg_frm_close).replace('$-','-$')
             pct_chg_frm_close = "{:.1%}".format(pct_chg_frm_close).replace('$-','-$')
-    
-            st.header(f"{chg_frm_close} {pct_chg_frm_close}")
+
+            st.header(f"{chg_frm_close}  ({pct_chg_frm_close})")
             st.write("Change from close")
 
-        stock_fig = mpl.plot(data=chart_data[filter_stock.upper()], type=chart_type.lower(), style='yahoo', mav=(5,10,25), volume=True, title=filter_stock.upper())
-        st.pyplot(stock_fig)
+        col10, col11, col12, col13, col14 = st.beta_columns([0.5,15,1,12,0.5])
+        with col11:
+            st.write(filter_stock.upper())
+            stock_fig = mpl.plot(data=chart_data[filter_stock.upper()], type=chart_type.lower(), style='yahoo', mav=(5,10,25), volume=True)
+            st.pyplot(stock_fig)
+        with col13:
+            st.write('Chart Data:')
+            st.dataframe(chart_data[filter_stock.upper()], height=600)
+            # st.write(chart_data[filter_stock.upper()])
+        with col10, col12, col14:
+            st.write("")
 
-        # st.write(stock_data.info)
+        st.markdown("##")
+        st.markdown("___")
+        with st.beta_expander(label='Expand for Insider Trading (SEC Form 4):'):
+            url = (f'http://openinsider.com/screener?s={filter_stock}&o=&pl=&ph=&ll=&lh=&fd=730&fdr=&td=0&tdr=&fdlyl=&fdlyh=&daysago=&xp=1&xs=1&vl=&vh=&ocl=&och=&sic1=-1&sicl=100&sich=9999&grp=0&nfl=&nfh=&nil=&nih=&nol=&noh=&v2l=&v2h=&oc2l=&oc2h=&sortcol=0&cnt=100&page=1')
+            read_insider = pd.read_html(url)
+            insider = read_insider[-3].iloc[:,1:11]
+            st.write(insider)
 
-        with st.beta_expander(label='Click for data'):
-            st.write(chart_data[filter_stock.upper()])
 
 
 if __name__=='__main__':
