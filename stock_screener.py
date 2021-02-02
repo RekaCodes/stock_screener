@@ -18,16 +18,27 @@ def main():
 
     st.sidebar.title('Stock Analysis')
     st.sidebar.write("Insert ticker or select strategy.")  
-    st.sidebar.write("___") 
+    st.sidebar.write("####") 
     
 
     filter_stock = st.sidebar.text_input(label="Select a Stock", value='Insert Ticker')
+    
+    chart_type = st.sidebar.radio('Chart Type:',['Candle', 'OHLC', 'Line', 'PNF'])
+    
+    filter_time_frame = st.sidebar.selectbox(
+        "Time Frame",
+        ['1D:5m', '5D:1h', '1Mo:1d', '3Mo:1d', '6Mo:1d', '1Y:1w', '2Y:1w'],
+        index=4
+    )
+
+    filter_period = filter_time_frame[:3].lower()
+    filter_interval = filter_time_frame[-2:].lower()
 
 
     if st.sidebar.button('Get stock data'):
         with st.spinner("Wait for it....!"):
             # if st.button('Get stock data'):
-                chart_data=yf.download([filter_stock.upper(), 'SPY'], period='2y', interval='1d', group_by='ticker', auto_adjust=True)
+                chart_data=yf.download([filter_stock.upper(), 'SPY'], period=filter_period, interval=filter_interval, group_by='ticker', auto_adjust=True)
                 stock_data = yf.Ticker(filter_stock.upper())
 
                 st.header(f"{stock_data.info['shortName']} {stock_data.info['symbol']}")
@@ -55,7 +66,7 @@ def main():
 
                 stock_fig = plt.figure()
                 ax = stock_fig.add_subplot(111)
-                mpl.plot(data=chart_data[filter_stock.upper()], type='candle', style='yahoo', mav=(5,10,25), figscale=0.4, ax=ax)
+                mpl.plot(data=chart_data[filter_stock.upper()], type=chart_type.lower(), style='yahoo', mav=(5,10,25), figscale=0.4, ax=ax)
                 
                 from matplotlib.offsetbox import AnchoredText
                 at = AnchoredText(
@@ -74,7 +85,7 @@ def main():
                 # st.write(stock_data.info) << keep for future features
 
                 with st.beta_expander(label="Expand for Chart Data:"):
-                    st.dataframe(chart_data[filter_stock.upper()], height=600)
+                    st.dataframe(chart_data[filter_stock.upper()])
 
                 st.markdown("###")
 
@@ -83,6 +94,7 @@ def main():
                     read_insider = pd.read_html(url)
                     insider = read_insider[-3].iloc[:,1:11]
                     st.write(insider)
+
 
     st.sidebar.write("___")
 
