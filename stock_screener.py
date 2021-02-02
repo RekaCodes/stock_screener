@@ -71,9 +71,9 @@ def main():
                         st.write("Change from close")
 
 
-                    stock_fig = plt.figure()
+                    stock_fig = plt.figure(figsize=(16,7))
                     ax = stock_fig.add_subplot(111)
-                    mpl.plot(data=chart_data[filter_stock.upper()], type=chart_type.lower(), style='yahoo', mav=(5,10,25), figscale=0.4, ax=ax)
+                    mpl.plot(data=chart_data[filter_stock.upper()], type=chart_type.lower(), style='yahoo', mav=(5,10,25), ax=ax)
                     
                     from matplotlib.offsetbox import AnchoredText
                     at = AnchoredText(
@@ -82,11 +82,9 @@ def main():
                         frameon=False,
                         prop=dict(fontsize=32, fontweight='bold', alpha=0.2))
                     ax.add_artist(at)
-                    
                     st.pyplot(stock_fig)
                     
                     
-                    st.markdown("##")
                     st.markdown("___")
                     
                     # st.write(stock_data.info) << keep for future features
@@ -115,7 +113,7 @@ def main():
     )
 
     if st.sidebar.button("Run Screening Strategy"):
-        st.write(f"You chose {slct_screener}. Strategies will be implemented soon!")
+        st.warning(f"You chose the {slct_screener} strategy. Strategies will be implemented soon! For now select a stock.")
 
                 
 
