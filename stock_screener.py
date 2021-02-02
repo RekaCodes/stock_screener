@@ -3,7 +3,6 @@ import streamlit as st
 st.set_page_config(layout='wide')
 import pandas as pd
 import matplotlib.pyplot as plt
-import plotly.graph_objects as go
 import mplfinance as mpl
 import yfinance as yf
 st.set_option('deprecation.showPyplotGlobalUse', False)
