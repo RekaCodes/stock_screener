@@ -21,7 +21,7 @@ def main():
     st.sidebar.write("####") 
     
 
-    filter_stock = st.sidebar.text_input(label="Select a Stock", value='Insert Ticker')
+    filter_stock = st.sidebar.text_input(label="Insert Ticker Symbol", value='')
     
     chart_type = st.sidebar.radio('Chart Type:',['Candle', 'OHLC', 'Line', 'PNF'])
     
@@ -40,8 +40,12 @@ def main():
             # if st.button('Get stock data'):
                 chart_data=yf.download([filter_stock.upper(), 'SPY'], period=filter_period, interval=filter_interval, group_by='ticker', auto_adjust=True)
                 stock_data = yf.Ticker(filter_stock.upper())
+                try:                    
+                    st.header(f"{stock_data.info['shortName']} {stock_data.info['symbol']}")
+                except ValueError:
+                    st.write('You forgot to enter a ticker!')
 
-                st.header(f"{stock_data.info['shortName']} {stock_data.info['symbol']}")
+
 
                 st.text_area(label=f"About {stock_data.info['shortName']}", value=stock_data.info['longBusinessSummary'], height=125)
 
