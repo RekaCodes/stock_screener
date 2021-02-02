@@ -33,71 +33,74 @@ def main():
 
     filter_period = filter_time_frame[:3].lower()
     filter_interval = filter_time_frame[-2:].lower()
-
+    
 
     if st.sidebar.button('Get stock data'):
-        with st.spinner("Wait for it....!"):
-            # if st.button('Get stock data'):
-                chart_data=yf.download([filter_stock.upper(), 'SPY'], period=filter_period, interval=filter_interval, group_by='ticker', auto_adjust=True)
-                stock_data = yf.Ticker(filter_stock.upper())
-                try:                    
-                    st.header(f"{stock_data.info['shortName']} {stock_data.info['symbol']}")
-                except ValueError:
-                    st.write('You forgot to enter a ticker!')
+        if filter_stock=="":
+            st.warning("Don't forget to enter a ticker symbol.")
+        else:
+            with st.spinner("Wait for it....!"):
+                # if st.button('Get stock data'):
+                    chart_data=yf.download([filter_stock.upper(), 'SPY'], period=filter_period, interval=filter_interval, group_by='ticker', auto_adjust=True)
+                    stock_data = yf.Ticker(filter_stock.upper())
+                    try:                    
+                        st.header(f"{stock_data.info['shortName']} {stock_data.info['symbol']}")
+                    except HTTPError:
+                        st.write('You forgot to enter a ticker!')
 
 
 
-                st.text_area(label=f"About {stock_data.info['shortName']}", value=stock_data.info['longBusinessSummary'], height=125)
+                    st.text_area(label=f"About {stock_data.info['shortName']}", value=stock_data.info['longBusinessSummary'], height=125)
 
-                col7, col8, col9 = st.beta_columns(3)
-                with col7:
-                    st.title('${:0,.2f}'.format(stock_data.info['ask']))
-                with col9:
-                    st.write('52W High| ${:0,.2f}'.format(stock_data.info['fiftyTwoWeekHigh']))
-                    st.write('52W Low| ${:0,.2f}'.format(stock_data.info['fiftyTwoWeekLow']))
+                    col7, col8, col9 = st.beta_columns(3)
+                    with col7:
+                        st.title('${:0,.2f}'.format(stock_data.info['ask']))
+                    with col9:
+                        st.write('52W High| ${:0,.2f}'.format(stock_data.info['fiftyTwoWeekHigh']))
+                        st.write('52W Low| ${:0,.2f}'.format(stock_data.info['fiftyTwoWeekLow']))
 
-                with col8:
-                    close_prior = stock_data.info['previousClose']
-                    ask_current = stock_data.info['ask']
-                    chg_frm_close = ask_current - close_prior
-                    pct_chg_frm_close = chg_frm_close/close_prior
-                    chg_frm_close = "${:0,.2f}".format(chg_frm_close).replace('$-','-$')
-                    pct_chg_frm_close = "{:.1%}".format(pct_chg_frm_close).replace('$-','-$')
+                    with col8:
+                        close_prior = stock_data.info['previousClose']
+                        ask_current = stock_data.info['ask']
+                        chg_frm_close = ask_current - close_prior
+                        pct_chg_frm_close = chg_frm_close/close_prior
+                        chg_frm_close = "${:0,.2f}".format(chg_frm_close).replace('$-','-$')
+                        pct_chg_frm_close = "{:.1%}".format(pct_chg_frm_close).replace('$-','-$')
 
-                    st.header(f"{chg_frm_close}  ({pct_chg_frm_close})")
-                    st.write("Change from close")
+                        st.header(f"{chg_frm_close}  ({pct_chg_frm_close})")
+                        st.write("Change from close")
 
 
-                stock_fig = plt.figure()
-                ax = stock_fig.add_subplot(111)
-                mpl.plot(data=chart_data[filter_stock.upper()], type=chart_type.lower(), style='yahoo', mav=(5,10,25), figscale=0.4, ax=ax)
-                
-                from matplotlib.offsetbox import AnchoredText
-                at = AnchoredText(
-                    f"{filter_stock.upper()}",
-                    loc='upper left',
-                    frameon=False,
-                    prop=dict(fontsize=32, fontweight='bold', alpha=0.2))
-                ax.add_artist(at)
-                
-                st.pyplot(stock_fig)
-                
-                
-                st.markdown("##")
-                st.markdown("___")
-                
-                # st.write(stock_data.info) << keep for future features
+                    stock_fig = plt.figure()
+                    ax = stock_fig.add_subplot(111)
+                    mpl.plot(data=chart_data[filter_stock.upper()], type=chart_type.lower(), style='yahoo', mav=(5,10,25), figscale=0.4, ax=ax)
+                    
+                    from matplotlib.offsetbox import AnchoredText
+                    at = AnchoredText(
+                        f"{filter_stock.upper()}",
+                        loc='upper left',
+                        frameon=False,
+                        prop=dict(fontsize=32, fontweight='bold', alpha=0.2))
+                    ax.add_artist(at)
+                    
+                    st.pyplot(stock_fig)
+                    
+                    
+                    st.markdown("##")
+                    st.markdown("___")
+                    
+                    # st.write(stock_data.info) << keep for future features
 
-                with st.beta_expander(label="Expand for Chart Data:"):
-                    st.dataframe(chart_data[filter_stock.upper()])
+                    with st.beta_expander(label="Expand for Chart Data:"):
+                        st.dataframe(chart_data[filter_stock.upper()])
 
-                st.markdown("###")
+                    st.markdown("###")
 
-                with st.beta_expander(label='Expand for Insider Trading (SEC Form 4):'):
-                    url = (f'http://openinsider.com/screener?s={filter_stock}&o=&pl=&ph=&ll=&lh=&fd=730&fdr=&td=0&tdr=&fdlyl=&fdlyh=&daysago=&xp=1&xs=1&vl=&vh=&ocl=&och=&sic1=-1&sicl=100&sich=9999&grp=0&nfl=&nfh=&nil=&nih=&nol=&noh=&v2l=&v2h=&oc2l=&oc2h=&sortcol=0&cnt=100&page=1')
-                    read_insider = pd.read_html(url)
-                    insider = read_insider[-3].iloc[:,1:11]
-                    st.write(insider)
+                    with st.beta_expander(label='Expand for Insider Trading (SEC Form 4):'):
+                        url = (f'http://openinsider.com/screener?s={filter_stock}&o=&pl=&ph=&ll=&lh=&fd=730&fdr=&td=0&tdr=&fdlyl=&fdlyh=&daysago=&xp=1&xs=1&vl=&vh=&ocl=&och=&sic1=-1&sicl=100&sich=9999&grp=0&nfl=&nfh=&nil=&nih=&nol=&noh=&v2l=&v2h=&oc2l=&oc2h=&sortcol=0&cnt=100&page=1')
+                        read_insider = pd.read_html(url)
+                        insider = read_insider[-3].iloc[:,1:11]
+                        st.write(insider)
 
 
     st.sidebar.write("___")
