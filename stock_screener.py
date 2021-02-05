@@ -10,7 +10,6 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 
 
 
-
 # build app #
 def main():
 
@@ -18,25 +17,29 @@ def main():
     ## Stock Selector ##
 
     st.sidebar.title('Stock Analysis')
+
+
     st.sidebar.write("Insert ticker or select strategy.")  
     st.sidebar.write("####") 
     
-
     filter_stock = st.sidebar.text_input(label="Insert Ticker Symbol", value='')
-    
-    chart_type = st.sidebar.radio('Chart Type:',['Candle', 'OHLC', 'Line', 'PNF'])
-    
-    filter_time_frame = st.sidebar.selectbox(
-        "Time Frame",
-        ['1D:5m', '5D:1h', '1Mo:1d', '3Mo:1d', '6Mo:1d', '1Y:1wk', '2Y:1wk'],
-        index=4
-    )
 
-    filter_period = filter_time_frame.split(":")[0].lower()
-    filter_interval = filter_time_frame.split(":")[1].lower()
+    # chart_type = st.sidebar.radio('Chart Type:',['Candle', 'OHLC', 'Line', 'PNF'])
+    
+    # filter_time_frame = st.sidebar.selectbox(
+    #     "Time Frame",
+    #     ['1D:5m', '5D:1h', '1Mo:1d', '3Mo:1d', '6Mo:1d', '1Y:1wk', '2Y:1wk'],
+    #     index=4
+    # )
+
+    # filter_period = filter_time_frame.split(":")[0].lower()
+    # filter_interval = filter_time_frame.split(":")[1].lower()
+    chart_type = 'candle'
+    filter_period = '6mo'
+    filter_interval = '1d'
     
 
-    if st.sidebar.button('Get stock data'):
+    if st.sidebar.button('Lookup Stock'):
         if filter_stock=="":
             st.warning("Don't forget to enter a ticker symbol.")
         else:
@@ -45,22 +48,20 @@ def main():
                     chart_data=yf.download([filter_stock.upper(), 'SPY'], period=filter_period, interval=filter_interval, group_by='ticker', auto_adjust=True)
                     stock_data = yf.Ticker(filter_stock.upper())
                     try:                    
-                        st.header(f"{stock_data.info['shortName']} {stock_data.info['symbol']}")
+                        st.header(f"{stock_data.info['shortName']}")
                     except HTTPError:
                         st.write('You forgot to enter a ticker!')
 
 
-
-                    st.text_area(label=f"About {stock_data.info['shortName']}", value=stock_data.info['longBusinessSummary'], height=125)
-
-                    col7, col8, col9 = st.beta_columns(3)
-                    with col7:
+                    col1, col2, col3 = st.beta_columns(3)
+                    with col1:
                         st.title('${:0,.2f}'.format(stock_data.info['ask']))
-                    with col9:
+                    
+                    with col3:
                         st.write('52W High| ${:0,.2f}'.format(stock_data.info['fiftyTwoWeekHigh']))
                         st.write('52W Low| ${:0,.2f}'.format(stock_data.info['fiftyTwoWeekLow']))
 
-                    with col8:
+                    with col2:
                         close_prior = stock_data.info['previousClose']
                         ask_current = stock_data.info['ask']
                         chg_frm_close = ask_current - close_prior
@@ -71,6 +72,23 @@ def main():
                         st.header(f"{chg_frm_close}  ({pct_chg_frm_close})")
                         st.write("Change from close")
 
+                    with st.beta_expander('Expand to Edit Chart Parameters',expanded=False):
+                        # filter_stock = st.sidebar.text_input(label="Insert Ticker Symbol", value='')
+                        col4, col5, col6 = st.beta_columns([2,2,3])
+                        with col4:
+                            st.write('<style>div.row-widget.stRadio > div{flex-direction:row;}</style>', unsafe_allow_html=True)
+                            chart_type = st.radio('Chart Type:',['Candle', 'OHLC', 'Line', 'PNF'])
+                        with col5:
+                            filter_time_frame = st.selectbox(
+                            "Time Frame",
+                            ['1D:5m', '5D:1h', '1Mo:1d', '3Mo:1d', '6Mo:1d', '1Y:1wk', '2Y:1wk'],
+                            index=4
+                            )
+
+                            filter_period = filter_time_frame.split(":")[0].lower()
+                            filter_interval = filter_time_frame.split(":")[1].lower()
+                    
+                    st.write("")
 
                     stock_fig = plt.figure(figsize=(16,7))
                     ax = stock_fig.add_subplot(111)
@@ -87,18 +105,19 @@ def main():
                     
                     
                     st.markdown("___")
-                    
+
+                    st.text_area(label=f"About {stock_data.info['shortName']}", value=stock_data.info['longBusinessSummary'], height=200)
                     # st.write(stock_data.info) << keep for future features
 
-                    with st.beta_expander(label="Expand for Chart Data:"):
-                        st.dataframe(chart_data[filter_stock.upper()])
+                    # with st.beta_expander(label="Expand for Chart Data:"):
+                    #     st.dataframe(chart_data[filter_stock.upper()])
 
                     st.markdown("###")
 
                     with st.beta_expander(label='Expand for Insider Trading (SEC Form 4):'):
                         url_insiders = (f'http://openinsider.com/screener?s={filter_stock}&o=&pl=&ph=&ll=&lh=&fd=730&fdr=&td=0&tdr=&fdlyl=&fdlyh=&daysago=&xp=1&xs=1&vl=&vh=&ocl=&och=&sic1=-1&sicl=100&sich=9999&grp=0&nfl=&nfh=&nil=&nih=&nol=&noh=&v2l=&v2h=&oc2l=&oc2h=&sortcol=0&cnt=100&page=1')
                         read_insider = pd.read_html(url_insiders)
-                        insider = read_insider[-3].iloc[:,1:11]
+                        insider = read_insider[-3].iloc[:,1:12]
                         st.write(insider)
 
 
@@ -118,6 +137,11 @@ def main():
     #         read_highdiv = pd.read_html('https://finviz.com/screener.ashx?v=160&f=fa_div_high,idx_sp500&ft=4&o=-dividendyield')
     #         highdiv = read_highdiv[-1]
     #         st.write(highdiv)
+        if slct_screener=='Insider Trading':
+            st.header("Latest Insider Trading")
+            read_ins_trading = pd.read_html('http://openinsider.com/latest-insider-trading')
+            ins_trading = read_ins_trading[-3].iloc[:,1:13]
+            st.dataframe(ins_trading, height=550)
     #     else:
     #         st.warning(f"You chose the {slct_screener} strategy. Strategies will be implemented soon! For now select a stock.")
         st.warning(f"You chose the {slct_screener} strategy. Strategies will be implemented soon! For now select a stock.")
