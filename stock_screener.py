@@ -3,7 +3,7 @@ import streamlit as st
 st.set_page_config(layout='wide')
 import pandas as pd
 import matplotlib.pyplot as plt
-plt.style.use('seaborn')
+plt.style.use('fivethirtyeight')
 import mplfinance as mpl
 import yfinance as yf
 st.set_option('deprecation.showPyplotGlobalUse', False)
