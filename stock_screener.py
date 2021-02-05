@@ -3,6 +3,7 @@ import streamlit as st
 st.set_page_config(layout='wide')
 import pandas as pd
 import matplotlib.pyplot as plt
+plt.style.use('seaborn')
 import mplfinance as mpl
 import yfinance as yf
 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -27,12 +28,12 @@ def main():
     
     filter_time_frame = st.sidebar.selectbox(
         "Time Frame",
-        ['1D:5m', '5D:1h', '1Mo:1d', '3Mo:1d', '6Mo:1d', '1Y:1w', '2Y:1w'],
+        ['1D:5m', '5D:1h', '1Mo:1d', '3Mo:1d', '6Mo:1d', '1Y:1wk', '2Y:1wk'],
         index=4
     )
 
-    filter_period = filter_time_frame[:3].lower()
-    filter_interval = filter_time_frame[-2:].lower()
+    filter_period = filter_time_frame.split(":")[0].lower()
+    filter_interval = filter_time_frame.split(":")[1].lower()
     
 
     if st.sidebar.button('Get stock data'):
@@ -80,7 +81,7 @@ def main():
                         f"{filter_stock.upper()}",
                         loc='upper left',
                         frameon=False,
-                        prop=dict(fontsize=32, fontweight='bold', alpha=0.2))
+                        prop=dict(fontsize=42, fontweight='bold', alpha=0.15, color='slategrey'))
                     ax.add_artist(at)
                     st.pyplot(stock_fig)
                     
@@ -95,8 +96,8 @@ def main():
                     st.markdown("###")
 
                     with st.beta_expander(label='Expand for Insider Trading (SEC Form 4):'):
-                        url = (f'http://openinsider.com/screener?s={filter_stock}&o=&pl=&ph=&ll=&lh=&fd=730&fdr=&td=0&tdr=&fdlyl=&fdlyh=&daysago=&xp=1&xs=1&vl=&vh=&ocl=&och=&sic1=-1&sicl=100&sich=9999&grp=0&nfl=&nfh=&nil=&nih=&nol=&noh=&v2l=&v2h=&oc2l=&oc2h=&sortcol=0&cnt=100&page=1')
-                        read_insider = pd.read_html(url)
+                        url_insiders = (f'http://openinsider.com/screener?s={filter_stock}&o=&pl=&ph=&ll=&lh=&fd=730&fdr=&td=0&tdr=&fdlyl=&fdlyh=&daysago=&xp=1&xs=1&vl=&vh=&ocl=&och=&sic1=-1&sicl=100&sich=9999&grp=0&nfl=&nfh=&nil=&nih=&nol=&noh=&v2l=&v2h=&oc2l=&oc2h=&sortcol=0&cnt=100&page=1')
+                        read_insider = pd.read_html(url_insiders)
                         insider = read_insider[-3].iloc[:,1:11]
                         st.write(insider)
 
@@ -113,9 +114,16 @@ def main():
     )
 
     if st.sidebar.button("Run Screening Strategy"):
+    #     if slct_screener=='High Dividend Yield':
+    #         read_highdiv = pd.read_html('https://finviz.com/screener.ashx?v=160&f=fa_div_high,idx_sp500&ft=4&o=-dividendyield')
+    #         highdiv = read_highdiv[-1]
+    #         st.write(highdiv)
+    #     else:
+    #         st.warning(f"You chose the {slct_screener} strategy. Strategies will be implemented soon! For now select a stock.")
         st.warning(f"You chose the {slct_screener} strategy. Strategies will be implemented soon! For now select a stock.")
 
-                
+    
+
 
     
 
