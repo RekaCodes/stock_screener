@@ -37,6 +37,24 @@ def main():
     chart_type = 'candle'
     filter_period = '6mo'
     filter_interval = '1d'
+    # with st.sidebar.beta_expander('Expand to Edit Chart Parameters',expanded=False):
+    #                     # filter_stock = st.sidebar.text_input(label="Insert Ticker Symbol", value='')
+    
+    col4, col5 = st.sidebar.beta_columns(2)
+    with col4:
+        st.write('<style>div.row-widget.stRadio > div{flex-direction:row;}</style>', unsafe_allow_html=True)
+        chart_type = st.radio('Chart Type:',['Candle', 'OHLC', 'Line', 'PNF'])
+    with col5:
+        st.write("")
+        filter_time_frame = st.selectbox(
+        "Time Frame",
+        ['1D:5m', '5D:1h', '1Mo:1d', '3Mo:1d', '6Mo:1d', '1Y:1wk', '2Y:1wk'],
+        index=4
+        )
+    st.markdown("##")
+
+    filter_period = filter_time_frame.split(":")[0].lower()
+    filter_interval = filter_time_frame.split(":")[1].lower()
     
 
     if st.sidebar.button('Lookup Stock'):
@@ -72,21 +90,6 @@ def main():
                         st.header(f"{chg_frm_close}  ({pct_chg_frm_close})")
                         st.write("Change from close")
 
-                    with st.beta_expander('Expand to Edit Chart Parameters',expanded=False):
-                        # filter_stock = st.sidebar.text_input(label="Insert Ticker Symbol", value='')
-                        col4, col5, col6 = st.beta_columns([2,2,3])
-                        with col4:
-                            st.write('<style>div.row-widget.stRadio > div{flex-direction:row;}</style>', unsafe_allow_html=True)
-                            chart_type = st.radio('Chart Type:',['Candle', 'OHLC', 'Line', 'PNF'])
-                        with col5:
-                            filter_time_frame = st.selectbox(
-                            "Time Frame",
-                            ['1D:5m', '5D:1h', '1Mo:1d', '3Mo:1d', '6Mo:1d', '1Y:1wk', '2Y:1wk'],
-                            index=4
-                            )
-
-                            filter_period = filter_time_frame.split(":")[0].lower()
-                            filter_interval = filter_time_frame.split(":")[1].lower()
                     
                     st.write("")
 
