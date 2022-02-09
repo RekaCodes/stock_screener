@@ -17,30 +17,16 @@ def main():
     ## Stock Selector ##
 
     st.sidebar.title('Stock Analysis')
-
-
     st.sidebar.write("Insert ticker or select strategy.")  
     st.sidebar.write("####") 
     
     filter_stock = st.sidebar.text_input(label="Insert Ticker Symbol", value='')
-
-    # chart_type = st.sidebar.radio('Chart Type:',['Candle', 'OHLC', 'Line', 'PNF'])
-    
-    # filter_time_frame = st.sidebar.selectbox(
-    #     "Time Frame",
-    #     ['1D:5m', '5D:1h', '1Mo:1d', '3Mo:1d', '6Mo:1d', '1Y:1wk', '2Y:1wk'],
-    #     index=4
-    # )
-
-    # filter_period = filter_time_frame.split(":")[0].lower()
-    # filter_interval = filter_time_frame.split(":")[1].lower()
     chart_type = 'candle'
     filter_period = '6mo'
     filter_interval = '1d'
-    # with st.sidebar.beta_expander('Expand to Edit Chart Parameters',expanded=False):
-    #                     # filter_stock = st.sidebar.text_input(label="Insert Ticker Symbol", value='')
+
     
-    col4, col5 = st.sidebar.beta_columns(2)
+    col4, col5 = st.sidebar.columns(2)
     with col4:
         st.write('<style>div.row-widget.stRadio > div{flex-direction:row;}</style>', unsafe_allow_html=True)
         chart_type = st.radio('Chart Type:',['Candle', 'OHLC', 'Line', 'PNF'])
@@ -71,7 +57,7 @@ def main():
                         st.write('You forgot to enter a ticker!')
 
 
-                    col1, col2, col3 = st.beta_columns(3)
+                    col1, col2, col3 = st.columns(3)
                     with col1:
                         st.title('${:0,.2f}'.format(stock_data.info['ask']))
                     
@@ -112,12 +98,10 @@ def main():
                     st.text_area(label=f"About {stock_data.info['shortName']}", value=stock_data.info['longBusinessSummary'], height=200)
                     # st.write(stock_data.info) << keep for future features
 
-                    # with st.beta_expander(label="Expand for Chart Data:"):
-                    #     st.dataframe(chart_data[filter_stock.upper()])
 
                     st.markdown("###")
 
-                    with st.beta_expander(label='Expand for Insider Trading (SEC Form 4):'):
+                    with st.expander(label='Expand for Insider Trading (SEC Form 4):'):
                         url_insiders = (f'http://openinsider.com/screener?s={filter_stock}&o=&pl=&ph=&ll=&lh=&fd=730&fdr=&td=0&tdr=&fdlyl=&fdlyh=&daysago=&xp=1&xs=1&vl=&vh=&ocl=&och=&sic1=-1&sicl=100&sich=9999&grp=0&nfl=&nfh=&nil=&nih=&nol=&noh=&v2l=&v2h=&oc2l=&oc2h=&sortcol=0&cnt=100&page=1')
                         read_insider = pd.read_html(url_insiders)
                         insider = read_insider[-3].iloc[:,1:12]
@@ -145,9 +129,8 @@ def main():
             read_ins_trading = pd.read_html('http://openinsider.com/latest-insider-trading')
             ins_trading = read_ins_trading[-3].iloc[:,1:13]
             st.dataframe(ins_trading, height=550)
-    #     else:
-    #         st.warning(f"You chose the {slct_screener} strategy. Strategies will be implemented soon! For now select a stock.")
-        st.warning(f"You chose the {slct_screener} strategy. Strategies will be implemented soon! For now select a stock.")
+        else:
+        st.warning(f"You chose the {slct_screener} strategy, which hasn't been implemented yet. For now select Latest Insider Trading or type a stock symbol above.")
 
  
 
