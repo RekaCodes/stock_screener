@@ -130,7 +130,7 @@ def main():
             ins_trading = read_ins_trading[-3].iloc[:,1:13]
             st.dataframe(ins_trading, height=550)
         else:
-        st.warning(f"You chose the {slct_screener} strategy, which hasn't been implemented yet. For now select Latest Insider Trading or type a stock symbol above.")
+            st.warning(f"You chose the {slct_screener} strategy, which hasn't been implemented yet. For now select Latest Insider Trading or type a stock symbol above.")
 
  
 
